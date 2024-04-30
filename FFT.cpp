@@ -50,8 +50,73 @@ std::vector<std::complex<double>> FastFourierTransform::DFT5(std::vector<std::co
 }
 std::vector<std::complex<double>> FastFourierTransform::Trasform(std::vector<std::complex<double>> signal, bool flag)
 {
+    int N = signal.size();
+    int marker = 0;
+    
+    if (N % 5 == 0 || marker == 0)
+    {
+        std::vector<std::vector<std::complex<double>>> transformed(N/5);
+        marker++;
+        for (int i = 0; i<N/5; i++) //проход по числу разбиений
+        {
+            for (int j = 0; j<N; j++) //проход по всем элементам сигнала
+            {
+                if(j%(N/5) == i)
+                transformed[i].push_back(signal[j]);
+            }
+            if(N / 5 != 1)
+                Trasform(transformed[i], flag);
+            transformed[i] = DFT5(transformed[i], flag);
+        }
+        std::vector<std::complex<double>> TEMP;
+        for(int i = 0; i < 5; i++)
+            for(int j = 0; j < N/5; j++)
+                TEMP.push_back(transformed[j][i]);
+        return TEMP;
+    }
 
-
+    else if (N % 3 == 0 || marker == 0)
+    {
+        std::vector<std::vector<std::complex<double>>> transformed(N/3);
+        marker++;
+        for (int i = 0; i<N/3; i++) //проход по числу разбиений
+        {
+            for (int j = 0; j<N; j++) //проход по всем элементам сигнала
+            {
+                if(j%(N/3) == i)
+                transformed[i].push_back(signal[j]);
+            }
+            if(N / 3 != 1)
+                Trasform(transformed[i], flag);
+            transformed[i] = DFT5(transformed[i], flag);
+        }
+        std::vector<std::complex<double>> TEMP;
+        for(int i = 0; i < 3; i++)
+            for(int j = 0; j < N/3; j++)
+                TEMP.push_back(transformed[j][i]);
+        return TEMP;
+    }
+    else if (N % 2 == 0 || marker == 0)
+    {
+        std::vector<std::vector<std::complex<double>>> transformed(N/2);
+        marker++;
+        for (int i = 0; i<N/2; i++) //проход по числу разбиений
+        {
+            for (int j = 0; j<N; j++) //проход по всем элементам сигнала
+            {
+                if(j%(N/2) == i)
+                transformed[i].push_back(signal[j]);
+            }
+            if(N / 2 != 1)
+                Trasform(transformed[i], flag);
+            transformed[i] = DFT5(transformed[i], flag);
+        }
+        std::vector<std::complex<double>> TEMP;
+        for(int i = 0; i < 2; i++)
+            for(int j = 0; j < N/2; j++)
+                TEMP.push_back(transformed[j][i]);
+        return TEMP;
+    }
     return {(0,0)};
 
 }

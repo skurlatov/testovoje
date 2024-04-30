@@ -2,6 +2,7 @@
 #include <cmath>
 #include <vector>
 #include <complex>
+#include <cstdlib>
 
 class FastFourierTransform
 {
