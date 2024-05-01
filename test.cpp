@@ -1,8 +1,18 @@
-#include "FFT.h"
-#pragma once
+#include <iostream>
+#include <cmath>
+#include <vector>
+#include <complex>
+#include <cstdlib>
+#define PI 3.141592654
 
-std::vector<std::complex<double>> FastFourierTransform::DFT2(std::vector<std::complex<double>> signal, bool flag) //Функция ДПФ-2
+class FastFourierTransform
 {
+    private:
+    //Уникальные значения матриц ДПФ
+    std::vector<std::complex<double>> DFT3Matrix = {{1.0, 0.0}, {-0.5, -0.866}, {-0.5, 0.866}}; //Уникальные значения матрицы ДПФ N = 3
+    std::vector<std::complex<double>> DFT5Matrix = {{1.0, 0.0}, {0.309, -0.951},{-0.809, -0.588},{-0.809, 0.588},{0.309, 0.951}}; //Уникальные значения матрицы ДПФ N = 5
+        std::vector<std::complex<double>> DFT2(std::vector<std::complex<double>> signal, bool flag)
+    {
     std::vector<std::complex<double>>transformed(2); //Инициализация Фурье-образа изначальной последовательности
     transformed[0] = signal[0] + signal[1]; //ДПФ-2 выполняется простыми арифметическими действиями 
     transformed[1] = signal[0] - signal[1];
@@ -14,10 +24,8 @@ std::vector<std::complex<double>> FastFourierTransform::DFT2(std::vector<std::co
                 transformed[i] = 0.5*transformed[i]; //Обратное ДПФ-2
             return {transformed};
         }
-
-}
-std::vector<std::complex<double>> FastFourierTransform::DFT3(std::vector<std::complex<double>> signal, bool flag)//Функция ДПФ-3
-{
+    } //Функция ДПФ для N = 2, flag указывает прямое (0) или обратное (1) преобразование
+    std::vector<std::complex<double>> DFT3(std::vector<std::complex<double>> signal, bool flag){
     std::vector<std::complex<double>>transformed(3);
     transformed[0] = signal[0]*DFT3Matrix[0] + signal[1]*DFT3Matrix[0] + signal[2]*DFT3Matrix[0]; //ДПФ-3 также можно представить в виде небольшого количества операций
     transformed[1] = signal[0]*DFT3Matrix[0] + signal[1]*DFT3Matrix[1+int(flag)] + signal[2]*DFT3Matrix[2-int(flag)]; //Значение flag влияет на индексацию таким образом,
@@ -30,9 +38,8 @@ std::vector<std::complex<double>> FastFourierTransform::DFT3(std::vector<std::co
                 transformed[i] = 0.333*transformed[i];
             return {transformed};
         }
-}
-std::vector<std::complex<double>> FastFourierTransform::DFT5(std::vector<std::complex<double>> signal, bool flag)//Функция ДПФ-5
-{
+    } //Функция ДПФ для N = 3
+    std::vector<std::complex<double>> DFT5(std::vector<std::complex<double>> signal, bool flag){
     std::vector<std::complex<double>> transformed(5);
     transformed[0] = signal[0] + signal[1] + signal[2] + signal[3] + signal[4]; //Нулевой отчет формируется простым суммированием
     for(int i = 1; i<5; i++)
@@ -47,10 +54,13 @@ std::vector<std::complex<double>> FastFourierTransform::DFT5(std::vector<std::co
                 transformed[i] = 0.2*transformed[i];
             return {transformed};
         }
-}
-    std::vector<std::complex<double>> FastFourierTransform::Trasform(std::vector<std::complex<double>> signal, bool flag)
+    } //Функция ДПФ для N = 5
+    
+    
+    public:
+    std::vector<std::complex<double>> Trasform(std::vector<std::complex<double>> signal, bool flag)
     {
-         int N = signal.size();
+        int N = signal.size();
         std::vector<std::complex<double>> copySignal = signal;
         int marker = 0;
         if (N % 5 == 0 && marker == 0)
@@ -171,3 +181,23 @@ std::vector<std::complex<double>> FastFourierTransform::DFT5(std::vector<std::co
     }
     return {(0,0)};
     }
+
+
+    }; //Функция БПФ для N кратного 2, 3 и 5
+
+
+
+
+int main()
+{
+    FastFourierTransform F1;
+    std::vector<std::complex<double>> signal{{0, 0}, {0, 1}, {1,0}, {1, 1}};
+    std::vector<std::complex<double>> FFTS = F1.Trasform(signal, 0);
+    for (int i = 0; i < signal.size(); i++)
+        std::cout << '#' << i+1 << " Re: " << FFTS[i].real() << " Im: " << FFTS[i].imag()<<std::endl;
+    std::cout << "__________________________________"<<std::endl;
+    FFTS = F1.Trasform(FFTS, 1);
+    for (int i = 0; i < signal.size(); i++)
+        std::cout << '#' << i+1 << " Re: " << FFTS[i].real() << " Im: " << FFTS[i].imag()<<std::endl;
+    return 0;
+}

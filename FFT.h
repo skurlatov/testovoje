@@ -3,6 +3,7 @@
 #include <vector>
 #include <complex>
 #include <cstdlib>
+#define PI 3.141592654
 
 class FastFourierTransform
 {
