@@ -48,11 +48,11 @@ std::vector<std::complex<double>> FastFourierTransform::DFT5(std::vector<std::co
             return {transformed};
         }
 }
-    std::vector<std::complex<double>> FastFourierTransform::Trasform(std::vector<std::complex<double>> signal, bool flag)
+    std::vector<std::complex<double>> FastFourierTransform::Trasform(std::vector<std::complex<double>> signal, bool flag)//Функция БПФ
     {
-         int N = signal.size();
-        std::vector<std::complex<double>> copySignal = signal;
-        int marker = 0;
+        int N = signal.size(); //Размер полученной последовательности комплексных данных
+        std::vector<std::complex<double>> copySignal = signal; //копирование последовательности для дальнейших изменений
+        int marker = 0; //маркер выбора ДПФ-2/3/5
         int check[3] = {5, 3, 2};
         for (int x = 0; x < 3; x++)
         {
@@ -62,7 +62,7 @@ std::vector<std::complex<double>> FastFourierTransform::DFT5(std::vector<std::co
             std::vector<std::vector<std::complex<double>>> transformed(N/check[x]);
             for (int i = 0; i<N/check[x]; i++) //проход по числу разбиений
                 {
-                for (int j = 0; j<N; j++) //проход по всем элементам сигнала
+                for (int j = 0; j<N; j++) //проход по всем элементам последовательности
                     {
                         if(j%(N/check[x]) == i)
                             transformed[i].push_back(copySignal[j]);
@@ -74,30 +74,30 @@ std::vector<std::complex<double>> FastFourierTransform::DFT5(std::vector<std::co
                 if (check[x] == 5)
                     transformed[i] = DFT5(transformed[i], flag);
                 }
-            if (N/check[x] != 1)
+            if (N/check[x] != 1) //дальнейшее разбиение последовательности, если она не разбита на простые N = 2/3/5
                 {
-                    std::vector<std::vector<std::complex<double>>> transformedRec(check[x]);
+                    std::vector<std::vector<std::complex<double>>> transformedRec(check[x]); //вектор для рекурсии
                     for(int i = 0; i < check[x]; i++)
                         {
-                            for(int j = 0; j < N/check[x]; j++)
-                                transformedRec[i].push_back(transformed[j][i]*std::polar(1.0, (-1+2*int(flag))*2*PI*j*i/N));
-                            transformedRec[i] = Trasform(transformedRec[i], flag);
+                            for(int j = 0; j < N/check[x]; j++) //заполнение вектора для рекурсии
+                                transformedRec[i].push_back(transformed[j][i]*std::polar(1.0, (-1+2*int(flag))*2*PI*j*i/N));//с домножением на поворачивающие коэффициенты
+                            transformedRec[i] = Trasform(transformedRec[i], flag); //рекурсивная часть программы
                         }
             
                     for(int i = 0; i < check[x]; i++)
                         {
                             for(int j = 0; j < N/check[x]; j++)
-                                transformed[j][i] = transformedRec[i][j];
+                                transformed[j][i] = transformedRec[i][j]; //заполнение в вектор преобразованных значений последовательности
                         }
             
                 }
             std::vector<std::complex<double>> TEMP;
             for(int i = 0; i < N/check[x]; i++)
                 for(int j = 0; j < check[x]; j++)
-                    TEMP.push_back(transformed[i][j]);
+                    TEMP.push_back(transformed[i][j]); //формирование преобразованного вектора
             copySignal = TEMP;
             return copySignal;
             }
         }
-    return {(0,0)};
+    return {(0,0)}; //дефолтный возврат в случае задачи вектора с некорректной длиной (не кратной 2, 3 и 5)
     }
